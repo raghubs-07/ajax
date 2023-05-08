@@ -10,7 +10,7 @@ export const CartPreviewEvents = {
 export default function (secureBaseUrl, cartId) {
     const loadingClass = 'is-loading';
     const $cart = $('[data-cart-preview]');
-    const $cartDropdown = $('#cart-preview-dropdown');
+    const $cartDropdown = $('#cart-preview-dropdownn');
     const $cartLoading = $('<div class="loadingOverlay"></div>');
 
     const $body = $('body');
@@ -60,6 +60,7 @@ export default function (secureBaseUrl, cartId) {
         utils.api.cart.getContent(options, (err, response) => {
             $cartDropdown
                 .removeClass(loadingClass)
+                .addClass('active')
                 .html(response);
             $cartLoading
                 .hide();

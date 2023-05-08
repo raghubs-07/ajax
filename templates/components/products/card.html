@@ -120,7 +120,7 @@
                         <a href="{{pre_order_add_to_cart_url}}" data-event-type="product-click" class="button button--small card-figcaption-button">{{lang 'products.pre_order'}}</a>
                     {{/if}}
                     {{#if add_to_cart_url }}
-                        <a href="{{add_to_cart_url}}" data-event-type="product-click" data-button-type="add-cart" class="button button--small card-figcaption-button">{{lang 'products.add_to_cart'}}</a>
+                        <button type="button" data-product-id="{{id}}" waitMessage="Adding to cart..." value="Add to cart" data-event-type="product-click" data-button-type="add-cart" class="card-atc button button--small card-figcaption-button">{{lang 'products.add_to_cart'}}</button>
                         <span class="product-status-message aria-description--hidden">{{lang 'category.add_cart_announcement'}}</span>
                     {{/if}}
                     {{#if out_of_stock_message }}

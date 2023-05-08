@@ -9,6 +9,7 @@ import mobileMenuToggle from './global/mobile-menu-toggle';
 import menu from './global/menu';
 import foundation from './global/foundation';
 import quickView from './global/quick-view';
+import cardAtc from './global/card-atc';
 import cartPreview from './global/cart-preview';
 import privacyCookieNotification from './global/cookieNotification';
 import carousel from './common/carousel';
@@ -22,6 +23,7 @@ export default class Global extends PageManager {
         currencySelector(cartId);
         foundation($(document));
         quickView(this.context);
+        cardAtc(this.context);
         carousel(this.context);
         menu();
         mobileMenuToggle();

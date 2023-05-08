@@ -26,7 +26,12 @@ export default class ProductDetails extends ProductDetailsBase {
         this.swatchGroupIdList = $('[id^="swatchGroup"]').map((_, group) => $(group).attr('id'));
         this.storeInitMessagesForSwatches();
 
+
+        console.log('From Product');
+
         const $form = $('form[data-cart-item-add]', $scope);
+
+        console.log($form);
 
         if ($form[0].checkValidity()) {
             this.updateProductDetailsData();
@@ -82,6 +87,7 @@ export default class ProductDetails extends ProductDetailsBase {
             this.productOptionsChanged(event);
             this.setProductVariant();
         });
+
 
         $form.on('submit', event => {
             this.addToCartValidator.performCheck();

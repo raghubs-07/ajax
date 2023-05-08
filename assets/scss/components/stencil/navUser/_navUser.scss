@@ -26,41 +26,28 @@
 
     @include breakpoint("medium") {
         padding: 0 spacing("single");
-        position: relative;
+        position: fixed;
         right: auto;
-        top: auto;
+        top: 0;
+        background: #fff;
         transform: none;
         z-index: zIndex("high");
     }
 
-    .dropdown-menu {
+    .dropdown-menu-cart {
         background-color: stencilColor("navUser-dropdown-backgroundColor");
         border: 1px solid stencilColor("navUser-dropdown-borderColor");
         box-shadow: container("dropShadow");
         position: absolute;
+        max-width: 22.85714rem;
+        font-size: 1rem;
+        height: auto;
+        width: 100%;
+        display: none;
 
-        &.is-open {
-            &::before {
-                @include css-triangle(
-                    $triangle-direction: "bottom",
-                    $triangle-size: 10px,
-                    $triangle-color: stencilColor("navUser-dropdown-borderColor")
-                );
-                bottom: 100%;
-                left: spacing("half");
-                position: absolute;
-            }
-
-            &::after {
-                @include css-triangle(
-                    $triangle-direction: "bottom",
-                    $triangle-size: 8px,
-                    $triangle-color: stencilColor("navUser-dropdown-backgroundColor")
-                );
-                bottom: 100%;
-                left: spacing("half") + remCalc(2px);
-                position: absolute;
-            }
+        &.active {
+            display: block;
+            left: 0;
         }
     }
 }
@@ -100,7 +87,7 @@
     }
 }
 
-.navUser-action--currencySelector + .dropdown-menu {
+.navUser-action--currencySelector+.dropdown-menu {
     &::before {
         left: auto !important; // 6
         right: spacing("half"); // 6
@@ -112,7 +99,7 @@
     }
 }
 
-.navUser-action--storeCredit + .dropdown-menu {
+.navUser-action--storeCredit+.dropdown-menu {
     max-width: remCalc(300px);
     padding: spacing("single");
 
@@ -178,6 +165,7 @@
             left: auto !important; // 7
             right: remCalc(5px); // 7
             top: auto !important; // 7
+
             @include breakpoint("medium") {
                 right: 0; // 7
             }
@@ -189,6 +177,7 @@
 
             &::before {
                 right: spacing("half") - remCalc(5px); // 8
+
                 @include breakpoint("medium") {
                     right: spacing("half"); // 8
                 }
@@ -196,6 +185,7 @@
 
             &::after {
                 right: spacing("half") - remCalc(3px); // 8
+
                 @include breakpoint("medium") {
                     right: spacing("half") + remCalc(2px); // 8
                 }
@@ -222,7 +212,7 @@
 
 .navUser-item--account {
     .navUser-or {
-        + .navUser-action {
+        +.navUser-action {
             margin-right: -0.5rem; // 1
         }
     }
@@ -254,11 +244,9 @@
         position: relative;
 
         &::before {
-            @include css-triangle(
-                $triangle-direction: "bottom",
+            @include css-triangle($triangle-direction: "bottom",
                 $triangle-size: 10px,
-                $triangle-color: color("greys", "lightest")
-            );
+                $triangle-color: color("greys", "lightest"));
             bottom: 0;
             left: 50%;
             position: absolute;
