@@ -1,62 +1,85 @@
-<div class="previewCartWrapper">
-    <div class="previewCart">
+<div class="cart-container">
+    <div class="cart-header">
+        <div class="cart-heading">
+            <div class="title">Cart</div>
+            <div class="title-qty">(<span class="cart-quantity"></span> Item)</div>
+        </div>
+        <button class="close-btn-cart">
+            <svg>
+                <use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#icon-close"></use>
+            </svg>
+        </button>
+    </div>
+    <div class="cart-wrapper">
         {{#if cart.items.length}}
-        <ul class="previewCartList">
-            {{#each (limit cart.items 4)}}
-            <li class="previewCartItem">
-                <div class="previewCartItem-image">
-                    {{#if type '==' 'GiftCertificate'}}
-                    <img alt="GiftCertificate" title="GiftCertificate"
-                        src="{{cdn ../theme_settings.default_image_gift_certificate}}">
-                    {{else}}
-                    {{> components/common/responsive-img
-                    image=image
-                    fallback_size=../theme_settings.productthumb_size
-                    lazyload=../theme_settings.lazyload_mode
-                    default_image=../theme_settings.default_image_product
-                    }}
-                    {{/if}}
-                </div>
-                <div class="previewCartItem-content">
-                    <span class="previewCartItem-brand">
-                        {{brand.name}}
-                    </span>
-
-                    <h6 class="previewCartItem-name">
-                        <a href="{{url}}" alt="{{name}}" title="{{name}}">{{name}}</a>
-                    </h6>
-
-                    <span class="previewCartItem-price">
-                        <!-- {{#if quantity '>' 1}}
-                        {{quantity}} &times;
-                        {{/if}} -->
-                        {{#or ../customer (unless ../settings.hide_price_from_guests) (if type '==' 'GiftCertificate')}}
-                        <span{{#if price_discounted}} class="price--discounted" {{/if}}>{{price.formatted}}
-                    </span>
-                    {{#if price_discounted}}
-                    {{price_discounted.formatted}}
-                    {{/if}}
-                    {{else}}
-                    {{> components/common/login-for-pricing}}
-                    {{/or}}
-                    </span>
-                    <div class="previewCartItem-quantity" item-id="{{id}}">
-                        <div class="quantity-wrapper">
-                            <span class="qty-minus" data-action="dec">-</span>
-                            <span id="qty-{{id}}">{{quantity}}</span>
-                            <span class="qty-plus" data-action="inc">+</span>
-                        </div>
-                        <button type="button" class="remove-btn">
-                            Remove
-                        </button>
+        <ul class="cartList">
+            {{#each cart.items }}
+            <li class="cart-item">
+                <div class="cart-container">
+                    <div class="cart-image">
+                        {{#if type '==' 'GiftCertificate'}}
+                        <img alt="GiftCertificate" title="GiftCertificate"
+                            src="{{cdn ../theme_settings.default_image_gift_certificate}}">
+                        {{else}}
+                        {{> components/common/responsive-img
+                        image=image
+                        fallback_size=../theme_settings.productthumb_size
+                        lazyload=../theme_settings.lazyload_mode
+                        default_image=../theme_settings.default_image_product
+                        }}
+                        {{/if}}
                     </div>
-                </div>
+                    <div class="title-wrapper">
+
+                        <h6 class="previewCartItem-name">
+                            <a href="{{url}}" class="cart-title" alt="{{name}}" title="{{name}}">{{name}}</a>
+                        </h6>
+
+                        <div class="cart-price">
+                            {{#or ../customer (unless ../settings.hide_price_from_guests) (if type '=='
+                            'GiftCertificate')}}
+                            <span{{#if price_discounted}} class="price--discounted" {{/if}}>{{price.formatted}}
+                                </span>
+                                {{#if price_discounted}}
+                                {{price_discounted.formatted}}
+                                {{/if}}
+                                {{else}}
+                                {{> components/common/login-for-pricing}}
+                                {{/or}}
+                                </span>
+                        </div>
+
+                        <div class="quantity-container" item-id="{{id}}">
+                            <div class="cart-qty-selector">
+                                <span class="cart-qty-minus" data-action="dec">-</span>
+                                <span class="cart-qty" id="qty-{{id}}"> {{#if quantity '>' 0}}
+                                    {{quantity}}
+                                    {{/if}}</span>
+                                <span class="cart-qty-plus" data-action="inc">+</span>
+                            </div><span class="cart-remove-btn">Remove</span>
+                        </div>
+
+                    </div>
             </li>
             {{/each}}
         </ul>
+    </div>
+    <div class="cart-footer hidden">
+        <div class="cart-sub__total">
+            <div class="sub-total">Sub total :</div>
+            <div class="sub-total-value"></div>
+        </div>
         <div class="previewCartAction">
+
+            <div
+                class="cart-viewCart {{#unless cart.show_primary_checkout_button}} previewCartAction-viewCart--sole{{/unless}}">
+                <a href="{{urls.cart}}" class="button button--small button--action">
+                    {{lang 'cart.preview.view_cart'}}
+                </a>
+            </div>
+
             {{#if cart.show_primary_checkout_button}}
-            <div class="previewCartAction-checkout">
+            <div class="cart-checkout">
                 <a href="{{urls.checkout.single_address}}" class="button button--small button--primary"
                     data-primary-checkout-now-action>
                     {{lang 'cart.preview.checkout_now'}}
@@ -64,12 +87,6 @@
             </div>
             {{/if}}
 
-            <div
-                class="previewCartAction-viewCart{{#unless cart.show_primary_checkout_button}} previewCartAction-viewCart--sole{{/unless}}">
-                <a href="{{urls.cart}}" class="button button--small button--action">
-                    {{lang 'cart.preview.view_cart'}}
-                </a>
-            </div>
 
             {{#if cart.show_multiple_address_shipping}}
             <div class="previewCartAction-checkoutMultiple">
@@ -79,6 +96,7 @@
             </div>
             {{/if}}
         </div>
+        <div class="shipping-msg">Shipping, taxes, and discounts calculated at checkout</div>
         {{#if cart.additional_checkout_buttons}}
         <div class="previewCart-additionalCheckoutButtons">
             {{#each cart.additional_checkout_buttons}}

@@ -2,6 +2,19 @@ import 'foundation-sites/js/foundation/foundation';
 import 'foundation-sites/js/foundation/foundation.dropdown';
 import utils from '@bigcommerce/stencil-utils';
 import { normalizeFormData } from '../common/utils/api';
+import { update } from 'lodash';
+
+
+
+//Get cart details
+// async function getCart(url) {
+//     return fetch(url, {
+//         method: "GET",
+//         credentials: "same-origin"
+//     })
+//         .then(response => response.json())
+//         .catch(error => console.error(error));
+// };
 
 export default function (context) {
 
@@ -12,6 +25,16 @@ export default function (context) {
     const options = {
         template: 'common/cart-preview',
     };
+
+
+    // close cart 
+
+    $('body').on('click', '.close-btn-cart', event => {
+        event.preventDefault();
+
+        const cartMenu = $(event.currentTarget).closest('.dropdown-menu-cart');
+        cartMenu.removeClass('is-open');
+    })
 
     //Add to card on Card
     $('body').on('click', '.card-atc', event => {
@@ -40,7 +63,7 @@ export default function (context) {
             utils.api.cart.getContent(options, (err, response) => {
                 $cartDropdown
                     .removeClass(loadingClass)
-                    .addClass('active')
+                    .addClass('is-open')
                     .html(response);
                 $cartLoading
                     .hide();
@@ -52,22 +75,43 @@ export default function (context) {
                             .text(quantity)
                             .toggleClass('countPill--positive', quantity > 0);
                     }
+                });
+
+                // update subtotal
+
+                fetch('/api/storefront/carts?include=lineItems.digitalItems.options,lineItems.physicalItems.options', {
+                    method: "GET",
+                    credentials: "same-origin"
                 })
+                    .then(response => response.json())
+                    .then(response => {
+                        let data = response;
+                        let symbol = data[0].currency.symbol;
+                        let Items = data[0].lineItems.physicalItems;
+
+                        let total = Items.reduce((acc, element) => {
+                            return acc + (element.salePrice * element.quantity);
+                        }, 0);
+
+                        $('.sub-total-value').text(`${symbol} ${total}`)
+
+                    })
+                    .catch(error => console.error(error));
             });
 
         });
     });
 
     //Delete cart Item from cart
-    $('body').on('click', '.remove-btn', event => {
+    $('body').on('click', '.cart-remove-btn', event => {
         event.preventDefault();
-        const itemId = $(event.currentTarget).closest('.previewCartItem-quantity').attr('item-id');
+        const itemId = $(event.currentTarget).closest('.quantity-container').attr('item-id');
 
         utils.api.cart.itemRemove(itemId, (err, response) => {
             utils.api.cart.getContent(options, (err, response) => {
                 $cartDropdown
                     .removeClass(loadingClass)
-                    .addClass('active')
+                    .addClass('is-open')
                     .html(response);
                 $cartLoading
                     .hide();
@@ -81,7 +125,27 @@ export default function (context) {
                     } else {
                         $('.cart-quantity').removeClass('countPill--positive')
                     }
+                });
+
+                // update subtotal
+                fetch('/api/storefront/carts?include=lineItems.digitalItems.options,lineItems.physicalItems.options', {
+                    method: "GET",
+                    credentials: "same-origin"
                 })
+                    .then(response => response.json())
+                    .then(response => {
+                        let data = response;
+                        let symbol = data[0].currency.symbol;
+                        let Items = data[0].lineItems.physicalItems;
+
+                        let total = Items.reduce((acc, element) => {
+                            return acc + (element.salePrice * element.quantity);
+                        }, 0);
+
+                        $('.sub-total-value').text(`${symbol} ${total}`)
+
+                    })
+                    .catch(error => console.error(error));
             });
         });
 
@@ -89,20 +153,21 @@ export default function (context) {
 
 
     //Update cart item quantity
-    $('body').on('click', '.qty-plus', event => {
+    $('body').on('click', '.cart-qty-plus', event => {
         event.preventDefault();
 
-        const itemId = $(event.currentTarget).closest('.previewCartItem-quantity').attr('item-id');
+        const itemId = $(event.currentTarget).closest('.quantity-container').attr('item-id');
 
         const $el = $(`#qty-${itemId}`);
         const oldQty = parseInt($el.text(), 10);
         const newQty = $(event.currentTarget).data('action') === 'inc' ? oldQty + 1 : oldQty - 1;
 
         utils.api.cart.itemUpdate(itemId, newQty, (err, response) => {
+            // console.log(response);
             utils.api.cart.getContent(options, (err, response) => {
                 $cartDropdown
                     .removeClass(loadingClass)
-                    .addClass('active')
+                    .addClass('is-open')
                     .html(response);
                 $cartLoading
                     .hide();
@@ -115,16 +180,37 @@ export default function (context) {
                             .toggleClass('countPill--positive', quantity > 0);
                     }
                 })
+
+                //Update Subtotal
+                fetch('/api/storefront/carts?include=lineItems.digitalItems.options,lineItems.physicalItems.options', {
+                    method: "GET",
+                    credentials: "same-origin"
+                })
+                    .then(response => response.json())
+                    .then(response => {
+                        let data = response;
+                        let symbol = data[0].currency.symbol;
+                        let Items = data[0].lineItems.physicalItems;
+
+                        let total = Items.reduce((acc, element) => {
+                            return acc + (element.salePrice * element.quantity);
+                        }, 0);
+
+                        $('.sub-total-value').text(`${symbol} ${total}`)
+
+                    })
+                    .catch(error => console.error(error));
+
             });
         });
 
     });
 
     //Decrement cart Item Quantity
-    $('body').on('click', '.qty-minus', event => {
+    $('body').on('click', '.cart-qty-minus', event => {
         event.preventDefault();
 
-        const itemId = $(event.currentTarget).closest('.previewCartItem-quantity').attr('item-id');
+        const itemId = $(event.currentTarget).closest('.quantity-container').attr('item-id');
 
         const $el = $(`#qty-${itemId}`);
         const oldQty = parseInt($el.text(), 10);
@@ -134,7 +220,7 @@ export default function (context) {
             utils.api.cart.getContent(options, (err, response) => {
                 $cartDropdown
                     .removeClass(loadingClass)
-                    .addClass('active')
+                    .addClass('is-open')
                     .html(response);
                 $cartLoading
                     .hide();
@@ -148,7 +234,27 @@ export default function (context) {
                     } else {
                         $('.cart-quantity').removeClass('countPill--positive')
                     }
+                });
+
+                //Update Subtotal
+                fetch('/api/storefront/carts?include=lineItems.digitalItems.options,lineItems.physicalItems.options', {
+                    method: "GET",
+                    credentials: "same-origin"
                 })
+                    .then(response => response.json())
+                    .then(response => {
+                        let data = response;
+                        let symbol = data[0].currency.symbol;
+                        let Items = data[0].lineItems.physicalItems;
+
+                        let total = Items.reduce((acc, element) => {
+                            return acc + (element.salePrice * element.quantity);
+                        }, 0);
+
+                        $('.sub-total-value').text(`${symbol} ${total}`)
+
+                    })
+                    .catch(error => console.error(error));
             });
         });
 

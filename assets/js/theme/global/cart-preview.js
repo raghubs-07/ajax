@@ -31,6 +31,8 @@ export default function (secureBaseUrl, cartId) {
         $('.cart-quantity')
             .text(quantity)
             .toggleClass('countPill--positive', quantity > 0);
+
+
         if (utils.tools.storage.localStorageAvailable()) {
             localStorage.setItem('cart-quantity', quantity);
         }
@@ -60,10 +62,39 @@ export default function (secureBaseUrl, cartId) {
         utils.api.cart.getContent(options, (err, response) => {
             $cartDropdown
                 .removeClass(loadingClass)
-                .addClass('active')
+                .addClass('is-open')
                 .html(response);
             $cartLoading
                 .hide();
+
+            utils.api.cart.getCartQuantity({}, (err, quantity) => {
+                if (quantity > 0) {
+                    $('.title-qty .cart-quantity')
+                        .text(quantity)
+                        .toggleClass('countPill--positive', quantity > 0);
+                }
+            });
+
+            // update subtotal
+
+            fetch('/api/storefront/carts?include=lineItems.digitalItems.options,lineItems.physicalItems.options', {
+                method: "GET",
+                credentials: "same-origin"
+            })
+                .then(response => response.json())
+                .then(response => {
+                    let data = response;
+                    let symbol = data[0].currency.symbol;
+                    let Items = data[0].lineItems.physicalItems;
+
+                    let total = Items.reduce((acc, element) => {
+                        return acc + (element.salePrice * element.quantity);
+                    }, 0);
+
+                    $('.sub-total-value').text(`${symbol} ${total}`)
+
+                })
+                .catch(error => console.error(error));
         });
     });
 
